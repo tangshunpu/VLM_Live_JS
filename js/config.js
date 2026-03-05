@@ -7,7 +7,7 @@ const Config = {
     defaults: {
         // API Settings
         backendType: 'openai-compatible',
-        apiUrl: 'http://localhost:8000/v1',
+        apiUrl: 'https://api.openai.com/v1',
         apiKey: '',
         rememberKey: false,
         model: '',
