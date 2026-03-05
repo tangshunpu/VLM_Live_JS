@@ -224,7 +224,7 @@ const App = {
             if (apiKeyGroup) apiKeyGroup.style.display = 'block';
         } else {
             if (apiUrlInput && !apiUrlInput.value.includes('v1')) {
-                nextApiUrl = 'http://localhost:8000/v1';
+                nextApiUrl = 'https://api.openai.com/v1';
                 apiUrlInput.value = nextApiUrl;
             }
             if (apiKeyGroup) apiKeyGroup.style.display = 'block';
