@@ -1,0 +1,146 @@
+/* Theme Variables */
+
+/* Light Theme (Default) */
+:root {
+    /* Colors */
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --secondary-color: #64748b;
+    --secondary-hover: #475569;
+    --success-color: #16a34a;
+    --success-hover: #15803d;
+    --success-bg: #dcfce7;
+    --error-color: #dc2626;
+    --error-hover: #b91c1c;
+    --error-bg: #fee2e2;
+    --warning-color: #d97706;
+    --warning-hover: #b45309;
+    --warning-bg: #fef3c7;
+    --info-color: #0284c7;
+    --info-bg: #e0f2fe;
+
+    /* Background & Surface */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8fafc;
+    --panel-bg: #ffffff;
+    --input-bg: #ffffff;
+    --video-bg: #1e293b;
+    --code-bg: #f1f5f9;
+    --hover-bg: #f1f5f9;
+
+    /* Text */
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-tertiary: #94a3b8;
+
+    /* Border */
+    --border-color: #e2e8f0;
+
+    /* Buttons */
+    --btn-bg: #ffffff;
+    --btn-hover-bg: #f8fafc;
+
+    /* Scrollbar */
+    --scrollbar-track: #f1f5f9;
+    --scrollbar-thumb: #cbd5e1;
+    --scrollbar-thumb-hover: #94a3b8;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    /* Colors */
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
+    --secondary-color: #64748b;
+    --secondary-hover: #94a3b8;
+    --success-color: #22c55e;
+    --success-hover: #16a34a;
+    --success-bg: #14532d;
+    --error-color: #ef4444;
+    --error-hover: #dc2626;
+    --error-bg: #450a0a;
+    --warning-color: #f59e0b;
+    --warning-hover: #d97706;
+    --warning-bg: #451a03;
+    --info-color: #0ea5e9;
+    --info-bg: #0c4a6e;
+
+    /* Background & Surface */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --panel-bg: #1e293b;
+    --input-bg: #334155;
+    --video-bg: #0f172a;
+    --code-bg: #334155;
+    --hover-bg: #334155;
+
+    /* Text */
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #64748b;
+
+    /* Border */
+    --border-color: #334155;
+
+    /* Buttons */
+    --btn-bg: #334155;
+    --btn-hover-bg: #475569;
+
+    /* Scrollbar */
+    --scrollbar-track: #1e293b;
+    --scrollbar-thumb: #475569;
+    --scrollbar-thumb-hover: #64748b;
+}
+
+/* Apply theme colors to body */
+body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Theme-specific adjustments */
+[data-theme="dark"] select.form-control {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+}
+
+/* Theme toggle icon */
+#theme-toggle .icon-sun::before {
+    content: "☀️";
+}
+
+#theme-toggle .icon-moon::before {
+    content: "🌙";
+}
+
+[data-theme="dark"] #theme-toggle .icon-sun::before {
+    content: "🌙";
+}
+
+/* System preference fallback */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        /* Dark theme variables will be inherited from [data-theme="dark"] */
+        /* This allows automatic dark mode based on system preference */
+    }
+}
+
+/* Print styles */
+@media print {
+    .sidebar,
+    .header,
+    .video-panel,
+    .debug-panel,
+    .btn,
+    .form-actions {
+        display: none !important;
+    }
+
+    .main-panel {
+        width: 100%;
+    }
+
+    .results-panel {
+        height: auto;
+        max-height: none;
+    }
+}

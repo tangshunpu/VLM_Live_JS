@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VLM Live - Real-time Vision Language Model Demo</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/themes.css">
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="logo">VLM Live</h1>
+            <div class="header-controls">
+                <button id="theme-toggle" class="btn btn-icon" title="Toggle theme">
+                    <span class="icon-sun"></span>
+                </button>
+                <button id="layout-toggle" class="btn btn-icon" title="Toggle layout">
+                    <span class="icon-layout"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content layout-horizontal">
+            <!-- Left Panel: Configuration -->
+            <aside class="sidebar">
+                <!-- API Configuration -->
+                <section class="panel" id="api-config">
+                    <h2 class="panel-title">API Configuration</h2>
+
+                    <div class="form-group">
+                        <label for="backend-type">Backend Type</label>
+                        <select id="backend-type" class="form-control">
+                            <option value="openai-compatible">OpenAI Compatible</option>
+                            <option value="ollama">Ollama</option>
+                            <option value="vllm">vLLM (OpenAI Compatible)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="api-url">API URL</label>
+                        <input type="text" id="api-url" class="form-control"
+                               placeholder="http://localhost:8000/v1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="api-key">API Key</label>
+                        <div class="input-group">
+                            <input type="password" id="api-key" class="form-control"
+                                   placeholder="sk-...">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" id="remember-key">
+                                <span>Remember</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="model-select">Model</label>
+                        <div class="input-group">
+                            <select id="model-select" class="form-control">
+                                <option value="">-- Select Model --</option>
+                            </select>
+                            <input type="text" id="model-input" class="form-control hidden"
+                                   placeholder="model-name">
+                        </div>
+                        <button id="refresh-models" class="btn btn-sm">Refresh Models</button>
+                    </div>
+
+                    <div class="form-actions">
+                        <button id="test-connection" class="btn btn-primary">Test Connection</button>
+                        <span id="connection-status" class="status-indicator"></span>
+                    </div>
+                </section>
+
+                <!-- Camera Settings -->
+                <section class="panel" id="camera-settings">
+                    <h2 class="panel-title">Camera Settings</h2>
+
+                    <div class="form-group">
+                        <label for="camera-select">Camera Device</label>
+                        <select id="camera-select" class="form-control">
+                            <option value="">-- Select Camera --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="resolution">Resolution</label>
+                        <select id="resolution" class="form-control">
+                            <option value="640x480">640 x 480</option>
+                            <option value="1280x720" selected>1280 x 720</option>
+                            <option value="1920x1080">1920 x 1080</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="camera-fps">Camera FPS</label>
+                        <input type="range" id="camera-fps" min="1" max="60" value="30">
+                        <span id="camera-fps-value" class="range-value">30</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inference-fps">Inference FPS</label>
+                        <input type="range" id="inference-fps" min="0.1" max="10" step="0.1" value="1">
+                        <span id="inference-fps-value" class="range-value">1.0</span>
+                    </div>
+
+                    <div class="form-actions">
+                        <button id="camera-toggle" class="btn btn-primary">Start Camera</button>
+                    </div>
+                </section>
+
+                <!-- Image Processing -->
+                <section class="panel" id="image-settings">
+                    <h2 class="panel-title">Image Processing</h2>
+
+                    <div class="form-group">
+                        <label for="image-size">Input Size</label>
+                        <select id="image-size" class="form-control">
+                            <option value="224">224 x 224</option>
+                            <option value="336">336 x 336</option>
+                            <option value="448">448 x 448</option>
+                            <option value="512" selected>512 x 512</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group hidden" id="custom-size-group">
+                        <label>Custom Size</label>
+                        <div class="input-row">
+                            <input type="number" id="custom-width" class="form-control"
+                                   placeholder="Width" min="64" max="2048">
+                            <span>x</span>
+                            <input type="number" id="custom-height" class="form-control"
+                                   placeholder="Height" min="64" max="2048">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="image-format">Format</label>
+                        <select id="image-format" class="form-control">
+                            <option value="jpeg">JPEG</option>
+                            <option value="webp">WebP</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="image-quality">Quality</label>
+                        <input type="range" id="image-quality" min="0.1" max="1" step="0.1" value="0.8">
+                        <span id="image-quality-value" class="range-value">80%</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="resize-mode">Resize Mode</label>
+                        <select id="resize-mode" class="form-control">
+                            <option value="contain">Aspect Fit</option>
+                            <option value="cover">Aspect Fill</option>
+                            <option value="center-crop">Center Crop</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- Prompt Settings -->
+                <section class="panel" id="prompt-settings">
+                    <h2 class="panel-title">Prompt</h2>
+
+                    <div class="form-group">
+                        <label for="system-prompt">System Prompt</label>
+                        <textarea id="system-prompt" class="form-control" rows="2"
+                                  placeholder="You are a helpful assistant..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="user-prompt">User Prompt</label>
+                        <textarea id="user-prompt" class="form-control" rows="3"
+                                  placeholder="Describe what you see..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prompt-template">Preset Templates</label>
+                        <select id="prompt-template" class="form-control">
+                            <option value="">-- Select Template --</option>
+                            <option value="describe">Describe Scene</option>
+                            <option value="detect">Object Detection</option>
+                            <option value="ocr">OCR / Text Recognition</option>
+                            <option value="changes">Change Analysis</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="prompt-history">History</label>
+                        <div class="input-group">
+                            <select id="prompt-history" class="form-control">
+                                <option value="">-- Recent Prompts --</option>
+                            </select>
+                            <button id="clear-history" class="btn btn-sm" title="Clear history">Clear</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Advanced Settings -->
+                <section class="panel collapsible" id="advanced-settings">
+                    <h2 class="panel-title collapsible-header">
+                        Advanced Settings
+                        <span class="collapse-icon">▼</span>
+                    </h2>
+                    <div class="collapsible-content">
+                        <div class="form-group">
+                            <label for="timeout">Timeout (ms)</label>
+                            <input type="number" id="timeout" class="form-control"
+                                   value="30000" min="1000" max="120000">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="max-tokens">Max Tokens</label>
+                            <input type="number" id="max-tokens" class="form-control"
+                                   value="1024" min="1" max="8192">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="temperature">Temperature</label>
+                            <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7">
+                            <span id="temperature-value" class="range-value">0.7</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="max-retries">Max Retries</label>
+                            <input type="number" id="max-retries" class="form-control"
+                                   value="3" min="0" max="10">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="debug-mode">
+                                Debug Mode (Show raw request/response)
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="thinking-mode">
+                                Thinking Mode (Show reasoning process)
+                            </label>
+                        </div>
+                    </div>
+                </section>
+            </aside>
+
+            <!-- Right Panel: Video & Results -->
+            <div class="main-panel">
+                <!-- Video Preview -->
+                <section class="panel video-panel">
+                    <div class="video-header">
+                        <h2 class="panel-title">Live Preview</h2>
+                        <div class="video-controls">
+                            <button id="start-inference" class="btn btn-success" disabled>
+                                Start Inference
+                            </button>
+                            <button id="take-screenshot" class="btn btn-secondary" disabled>
+                                Screenshot
+                            </button>
+                        </div>
+                    </div>
+                    <div class="video-container">
+                        <video id="video-preview" autoplay playsinline muted></video>
+                        <canvas id="capture-canvas" class="hidden"></canvas>
+                        <div id="video-placeholder" class="video-placeholder">
+                            <span class="icon-camera"></span>
+                            <p>Camera not started</p>
+                        </div>
+                    </div>
+                    <div class="video-stats">
+                        <span id="fps-display">FPS: --</span>
+                        <span id="latency-display">Latency: --</span>
+                        <span id="drop-rate-display">Drop Rate: --</span>
+                    </div>
+                </section>
+
+                <!-- Results Panel -->
+                <section class="panel results-panel">
+                    <div class="results-header">
+                        <h2 class="panel-title">Results</h2>
+                        <div class="results-controls">
+                            <button id="toggle-view" class="btn btn-sm">Raw View</button>
+                            <button id="export-json" class="btn btn-sm">Export JSON</button>
+                            <button id="export-txt" class="btn btn-sm">Export TXT</button>
+                            <button id="clear-results" class="btn btn-sm">Clear</button>
+                        </div>
+                    </div>
+                    <div id="results-container" class="results-container">
+                        <div class="results-placeholder">
+                            <p>Start inference to see results</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Debug Panel (hidden by default) -->
+        <div id="debug-panel" class="debug-panel hidden">
+            <h3>Debug Info</h3>
+            <div id="debug-content" class="debug-content"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/adapters/base.js"></script>
+    <script src="js/adapters/openai_compat.js"></script>
+    <script src="js/adapters/ollama.js"></script>
+    <script src="js/camera.js"></script>
+    <script src="js/scheduler.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
